@@ -10,20 +10,22 @@ def run_stackelberg(total_cpu: float, total_memory: float, params: Optional[Dict
     scheduler = StackelbergScheduler(cluster, params)
     result = scheduler.stackelberg_equilibrium(verbose=False)
 
+    allocations = {
+        scheduler.tenants[i].name: {
+            "cpu": round(cpu, 2),
+            "memory": round(mem, 2),
+            "replicas": replicas
+        }
+        for i, (cpu, mem, replicas) in enumerate(result["allocations"])
+    }
+
     return {
-        "allocations": [
-            {
-                "tenant": scheduler.tenants[i].name,
-                "cpu_per_replica": round(cpu, 2),
-                "memory_per_replica": round(mem, 2),
-                "replicas": replicas
-            }
-            for i, (cpu, mem, replicas) in enumerate(result["allocations"])
-        ],
+        "allocations": allocations,
         "prices": {
             "cpu": round(result["prices"][0], 3),
             "memory": round(result["prices"][1], 3)
         },
         "platform_utility": result["platform_utility"],
-        "converged": result["converged"]
+        "metrics": {},  
+        "success": True
     }
