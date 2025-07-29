@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stackelberg-scheduler
+  namespace: kube-system
+  labels:
+    app: stackelberg-scheduler
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: stackelberg-scheduler
+  template:
+    metadata:
+      labels:
+        app: stackelberg-scheduler
+    spec:
+      serviceAccountName: stackelberg-scheduler
+      containers:
+      - name: scheduler
+        image: nouhabk23/stackelberg-scheduler:latest
+        imagePullPolicy: Always
+        command:
+        - /usr/local/bin/scheduler
+        - --config=/etc/kubernetes/scheduler-config.yaml
+        - --v=2
+        volumeMounts:
+        - name: config
+          mountPath: /etc/kubernetes
+          readOnly: true
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+      volumes:
+      - name: config
+        configMap:
+          name: stackelberg-scheduler-config

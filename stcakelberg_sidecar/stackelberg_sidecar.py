@@ -30,3 +30,4 @@ async def startup_event():
     for route in app.routes:
         print(f"Route: {route.path} - Methods: {getattr(route, 'methods', 'N/A')}")
     print("=== End routes ===")
+
